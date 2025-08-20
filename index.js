@@ -2,25 +2,13 @@ import jsonfile from "jsonfile";
 import moment from "moment";
 import simpleGit from "simple-git";
 
+// 2) path, date, data
 const path = "./data.json";
-const date = moment().format("YYYY-MM-DD HH:mm:ss"); // define it before use
+const date = moment().format("YYYY-MM-DD HH:mm:ss");
 const data = { date };
 
-async function run() {
-  try {
-    // write the JSON (jsonfile returns a promise)
-    await jsonfile.writeFile(path, data, { spaces: 2 });
-
-    // git add/commit/push
-    const git = simpleGit();
-    await git.add([path]);
-    await git.commit(date, undefined, { "--date": date });
-    await git.push();
-
-    console.log("Committed & pushed:", date);
-  } catch (err) {
-    console.error("Error:", err.message || err);
-  }
-}
-
-run();
+// 3) write -> add -> commit -> push (in order)
+jsonfile.writeFile(path, data, { spaces: 2 })
+  .then(() => simpleGit().add([path]).commit(date, { "--date": date }).push())
+  .then(() => console.log("Committed & pushed:", date))
+  .catch(err => console.error("Error:", err));
